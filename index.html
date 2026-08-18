@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>我的主页</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: "Microsoft YaHei", sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 17px;
+            color: #555;
+            margin: 15px 0 10px;
+        }
+        img {
+            display: block;
+            margin: 15px auto;
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            margin: 8px 5px;
+            border-radius: 20px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ff4747;
+        }
+        .video-btn {
+            background-color: #444;
+        }
+        .video-btn:hover {
+            background-color: #222;
+        }
+        .weibo-btn {
+            background-color: #e6162d;
+        }
+        .weibo-btn:hover {
+            background-color: #b80000;
+        }
+        /* ===== 游戏板块(与主页风格统一: 白卡片/圆角/红色按钮) ===== */
+        .game-card {
+            margin-top: 25px;
+            padding-bottom: 16px;
+        }
+        .game-card h2 {
+            color: #333;
+            font-size: 20px;
+            margin: 0 0 6px;
+        }
+        .game-tip {
+            font-size: 14px;
+            color: #888;
+            margin: 8px 0 14px;
+            line-height: 1.8;
+        }
+        canvas#game {
+            display: block;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            background: #0d2a8f;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+<script>
+    function playVideo() {
+        var newWindow = window.open('', '播放窗口', 'width=600,height=400');
+        newWindow.document.write(`
+            <html>
+            <head><title>精彩瞬间</title></head>
+            <body style="margin:0; background-color:black; display:flex; justify-content:center; align-items:center;">
+                <video width="100%" height="100%" controls autoplay loop>
+                    <source src="鸡你太美.mp4" type="video/mp4">
+                    你的浏览器不支持视频播放。
+                </video>
+            </body>
+            </html>
+        `);
+        newWindow.document.close();
+    }
+</script>
+<body>
+    <div class="container">
+        <h1>大家好，我是练习时长两年半的个人练习生蔡徐坤</h1>
+        <p>这是我的卡通形象</p>
+        <img src="蔡徐坤卡通形象.jpg" width="300">
+        <p>想听听我的音乐吗？</p>
+        <button onclick="document.getElementById('鸡你太美').play(); this.blur()">▶ Music</button>
+        <button onclick="document.getElementById('鸡你太美').pause(); this.blur()">⏸ II</button>
+        <audio id="鸡你太美" src="鸡你太美.mp3"></audio>
+        <p>想看看我的 solo rap 加 sing & jump 吗？</p>
+        <button class="video-btn" onclick="playVideo(); this.blur()">▶ 点击播放独家solo</button>
+        <button class="weibo-btn" onclick="window.open('https://weibo.com/u/1776448504', '_blank'); this.blur()">📱 我的微博</button>
+    </div>
+
+    <div class="container game-card">
+        <h2>🎮 马保国 VS 蔡徐坤小鸡版</h2>
+        <p class="game-tip">
+            马保国: WASD移动 W跳 | J接 K化 L发 I闪电五连鞭 U不讲武德 O耗子尾汁<br>
+            蔡徐坤: 方向键移动 ↑跳 | 小键盘1鸡你太美 2铁山靠 3只因你太美 4律师函警告 5转圈 7唱歌<br>
+            空格键开始 | R重新开始
+        </p>
+        <canvas id="game" width="960" height="540"></canvas>
+        <p>
+            <button onclick="window.__gameAPI.start(); this.blur()">▶ 开始游戏</button>
+        </p>
+    </div>
+
+    <script>
+
+/* ============================================================================
+   马保国 VS 蔡徐坤小鸡版 —— 抽象搞笑格斗小游戏（单文件，无任何外部库）
+
+   【人物建模】(纯Canvas像素绘制, 无需任何图片文件)
+   坤坤小鸡: 像素风小黄鸡 - 深灰中分"坤头"/亮黄脸+红色圆腮红/大圆眼小瞳孔(呆滞无辜)/橘色微张嘴/
+             黑色无袖连帽背心+白色领口线+内搭深色边缘/手抱橙色篮球(黑色线条)/浅灰宽松长裤, 低分辨率马赛克复古街机风
+   马保国: 写实风 - 乌黑头发+花白鬓角+高发际线/额头眼角皱纹+法令纹/深邃锐利眼神/嘴唇紧闭+胡青下巴/
+           浅灰蓝中式立领唐装(三对一字盘扣)/宽松纯白长裤/白色圆头帆布武术鞋(黑包边), 姿态端正庄重
+   跑动动画: 双腿交替(左右脚前后摆动), 每5帧切换一次步态; 停下复位
+   防跑丢: 人物 x 坐标始终限制在 0 ~ 750 之间, 绝对不会移出屏幕
+   极简音效: 移动时播放"拳皇风格"打击音, 放技能播放"砰"低音(运行时合成WAV, 无需音频文件)
+
+   【操作说明】
+   马保国(左侧):  W=跳  A=左  D=右  S=下蹲(无效果)
+                  J=接(蓝色气功波)  K=化(消耗30能量·2秒无敌+每秒回5血)
+                  L=发(紫色大招)   I=闪电五连鞭(消耗50能量·全屏闪电5段x10伤)
+                  U=年轻人不讲武德(消耗40能量·瞬移偷袭20伤)  O=耗子尾汁(消耗20能量·回血30)
+   蔡徐坤小鸡(右侧): ↑=跳  ←=左  →=右
+                  小键盘1=鸡你太美(篮球·12伤+眩晕1秒)  2=铁山靠(消耗20能量·冲刺18伤)
+                  3=只因你太美(消耗25能量·3个粉色音符扇形)  4=律师函警告(消耗40能量·沉默3秒)
+                  5=坤式转圈(消耗35能量·旋风近身10伤/秒持续3秒)  7=唱歌大招(消耗50能量·全屏30伤)
+   被动: 马保国被击中20%概率闪避; 蔡徐坤被击中触发音效
+   空格键=开始   R键=重新开始(同时重新初始化音效系统)
+
+   【音效文件列表】(与本html放在同一文件夹, 文件名严格对应; 缺失时自动静默跳过, 游戏不会崩溃)
+   ma_jie.mp3  ma_hua.mp3  ma_fa.mp3  ma_wubian.mp3  ma_budao.mp3  ma_haozi.mp3  ma_dali.mp3
+   kun_jini.mp3  kun_tieshan.mp3  kun_zhiyin.mp3  kun_lvshi.mp3  kun_zhuanquan.mp3  kun_ge.mp3  kun_niganma.mp3
+   ============================================================================ */
+(function(){
+"use strict";
+var cv = document.getElementById('game');
+var ctx = cv.getContext('2d');
+var W = 960, H = 540;
+var WORLD_W = 1600, groundTop = 452;
+var camX = 0;
+var state = 'start';      // 'start' | 'play' | 'end'
+var winner = null, winT = 0, timeNow = performance.now();
+var lastTime = 0;
+
+/* ============================ 音效系统 ============================ */
+var SOUND_NAMES = ['ma_jie','ma_hua','ma_fa','ma_wubian','ma_budao','ma_haozi','ma_dali',
+                   'kun_jini','kun_tieshan','kun_zhiyin','kun_lvshi','kun_zhuanquan','kun_ge','kun_niganma'];
+var sounds = {};
+function initSounds(){
+  sounds = {};
+  for(var i=0;i<SOUND_NAMES.length;i++){
+    var n = SOUND_NAMES[i];
+    try{ sounds[n] = new Audio(n + '.mp3'); }catch(e){ sounds[n] = null; }
+  }
+}
+function playSnd(n){
+  var s = sounds[n];
+  if(!s) return;                       // 文件缺失/不支持 -> 静默跳过
+  try{ s.pause(); s.currentTime = 0; s.play(); }catch(e){}
+}
+function unlockAudio(){                // 第一次按键/点击时预热, 满足用户手势要求
+  for(var i=0;i<SOUND_NAMES.length;i++){
+    var s = sounds[SOUND_NAMES[i]];
+    if(!s) continue;
+    try{ s.volume = 0; s.play(); s.pause(); s.currentTime = 0; s.volume = 1; }catch(e){}
+  }
+  try{ sndHit.volume = 0; sndHit.play(); sndHit.pause(); sndHit.currentTime = 0; sndHit.volume = 1; }catch(e){}
+  try{ sndBoo.volume = 0; sndBoo.play(); sndBoo.pause(); sndBoo.currentTime = 0; sndBoo.volume = 1; }catch(e){}
+}
+initSounds();
+/* ---- 极简音效: 运行时合成WAV(无需任何音频文件) ----
+   拳皇打击音: 短促方波高音  砰低音: 低频正弦衰减 */
+function synthWav(dur, freq, vol, wave){
+  var sr = 22050, n = Math.floor(sr * dur);
+  var buf = new ArrayBuffer(44 + n * 2);
+  var dv = new DataView(buf);
+  function wstr(o, s){ for(var i=0;i<s.length;i++) dv.setUint8(o + i, s.charCodeAt(i)); }
+  wstr(0, 'RIFF'); dv.setUint32(4, 36 + n * 2, true); wstr(8, 'WAVE');
+  wstr(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+  dv.setUint32(24, sr, true); dv.setUint32(28, sr * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true);
+  wstr(36, 'data'); dv.setUint32(40, n * 2, true);
+  for(var i=0;i<n;i++){
+    var t = i / sr, v;
+    if(wave === 'square') v = (Math.sin(2 * Math.PI * freq * t) >= 0 ? 1 : -1);
+    else v = Math.sin(2 * Math.PI * freq * t);
+    var s = v * vol * (1 - i / n);                    // 指数/线性衰减包络
+    dv.setInt16(44 + i * 2, Math.max(-32767, Math.min(32767, s * 32767)), true);
+  }
+  return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+}
+var sndHit = null, sndBoo = null;
+try{ sndHit = new Audio(synthWav(0.09, 760, 0.5, 'square')); }catch(e){ sndHit = null; }
+try{ sndBoo = new Audio(synthWav(0.22, 110, 0.7, 'sine')); }catch(e){ sndBoo = null; }
+function playHit(){ var s = sndHit; if(!s) return; try{ s.pause(); s.currentTime = 0; s.play(); }catch(e){} }
+function playBoo(){ var s = sndBoo; if(!s) return; try{ s.pause(); s.currentTime = 0; s.play(); }catch(e){} }
+var audioUnlocked = false;
+
+/* ============================ 输入 ============================ */
+var keys = {};
+function keydown(e){
+  var c = e.code;
+  if(c === 'Space' || c.indexOf('Arrow') === 0) e.preventDefault();
+  keys[c] = true;
+  if(!audioUnlocked){ audioUnlocked = true; unlockAudio(); }
+  if(c === 'KeyR'){ restart(); return; }
+  if(state === 'start'){ if(c === 'Space') startGame(); return; }
+  if(state !== 'play') return;
+  switch(c){
+    case 'KeyJ': maJ(); break;
+    case 'KeyK': maK(); break;
+    case 'KeyL': maL(); break;
+    case 'KeyI': maI(); break;
+    case 'KeyU': maU(); break;
+    case 'KeyO': maO(); break;
+    case 'Numpad1': case 'Digit1': kun1(); break;
+    case 'Numpad2': case 'Digit2': kun2(); break;
+    case 'Numpad3': case 'Digit3': kun3(); break;
+    case 'Numpad4': case 'Digit4': kun4(); break;
+    case 'Numpad5': case 'Digit5': kun5(); break;
+    case 'Numpad7': case 'Digit7': kun7(); break;
+  }
+}
+function keyup(e){ keys[e.code] = false; }
+document.addEventListener('keydown', keydown);
+document.addEventListener('keyup', keyup);
+window.addEventListener('blur', function(){ keys = {}; });
+
+/* ============================ 玩家与状态 ============================ */
+var ma = null, kun = null, projectiles = [], texts = [], parts = [];
+var lastNiganma = 0;
+
+function makePlayer(side){
+  return {
+    side: side,
+    x: side === 'ma' ? 220 : 1360,
+    y: 0, vy: 0,
+    w: 48, h: 60,
+    facing: side === 'ma' ? 1 : -1,
+    hp: 100, energy: 100,
+    stun: 0, silence: 0, invincible: 0, regenT: 0,
+    spin: 0, spinTick: 0,
+    dash: 0, dashHit: false,
+    lightning: 0, lightTick: 0,
+    singT: 0, singDone: false, singFlash: 0,
+    step: 0, animT: 0,              // 跑动步态: 双腿交替切换 + 帧计时
+    cd: {}, hpFlash: 0, hurtFlash: 0,
+    onGround: true
+  };
+}
+function initPlayers(){
+  ma = makePlayer('ma');
+  kun = makePlayer('kun');
+  ma.w = 52; ma.h = 72;      // 写实风马保国(立领唐装武师)
+  kun.w = 48; kun.h = 60;    // 像素风小黄鸡(抱篮球)
+  ma.x = 150; kun.x = 600;          // 初始位置: 屏幕左右两侧
+  ma.y = 300; kun.y = 300;          // y 均在 300 左右
+  projectiles = []; texts = []; parts = [];
+}
+function startGame(){ initPlayers(); state = 'play'; }
+function restart(){ initSounds(); initPlayers(); state = 'play'; winner = null; }
+
+/* ============================ 通用工具 ============================ */
+function clamp(v, a, b){ return v < a ? a : (v > b ? b : v); }
+function rnd(a, b){ return a + Math.random() * (b - a); }
+function drawText(txt, x, y, size, color, align, outline){
+  ctx.font = 'bold ' + size + 'px "Microsoft YaHei","SimHei","PingFang SC",monospace';
+  ctx.textAlign = align || 'center';
+  ctx.textBaseline = 'middle';
+  if(outline){
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = Math.max(2, size / 7);
+    ctx.strokeText(txt, x, y);
+  }
+  ctx.fillStyle = color;
+  ctx.fillText(txt, x, y);
+}
+function capRect(x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function floatText(p, txt, color, dy){
+  texts.push({ x: p.x, y: p.y - 24 + (dy || 0), t: txt, c: color, life: 1.15, max: 1.15 });
+}
+function burst(x, y, color, n){
+  for(var i=0;i<n;i++){
+    parts.push({ x: x, y: y, vx: rnd(-2.5, 2.5), vy: rnd(-2.5, 1.5),
+                 life: rnd(0.25, 0.6), max: 0.6, c: color, s: rnd(2, 5) });
+  }
+}
+function rectOf(p){ return { x: p.x - p.w / 2, y: p.y, w: p.w, h: p.h }; }
+
+/* ============================ 人物建模(纯Canvas像素绘制) ============================
+   坤坤: 像素风小黄鸡 - 深灰中分"坤头"/黄脸红腮/大眼小瞳/橘嘴微张/黑无袖背心白领/浅灰裤/手抱橙篮球
+   马保国: 写实风 - 乌黑头发花白鬓角/皱纹法令纹/胡青下巴/浅灰蓝立领唐装三对盘扣/白裤白帆布鞋
+   跑动动画: 双腿交替(左右脚前后摆动 ±6px), 每5帧切换一次步态 */
+function px(x, y, w, h, c){ ctx.fillStyle = c; ctx.fillRect(x, y, w, h); }
+function drawLeg(hipX, topY, w, h, swing, color, shade){
+  px(hipX, topY, w, h, color);                 // 大腿
+  px(hipX + (w - 2) / 2, topY, 2, h, shade);   // 腿内侧阴影
+  var fx = hipX - 2 + swing;                   // 脚部随步态前后摆动(双腿交替)
+  px(fx, topY + h, w + 4, 2, color);
+  px(fx, topY + h, w + 4, 1, shade);
+}
+function drawShoe(shoeX, y, w, swing, color, trim){
+  var fx = shoeX + swing;
+  px(fx, y, w, 2, color);                      // 白色帆布鞋
+  px(fx, y + 2, w, 1, trim);                   // 黑色包边
+}
+function drawKun(leftSwing, rightSwing){
+  // 深灰色中分头发(经典坤头, 发丝涂抹感)
+  px(10, 0, 28, 6, '#4a4d52');      // 头顶
+  px(4, 4, 18, 8, '#4a4d52');       // 左侧发
+  px(26, 4, 18, 8, '#4a4d52');      // 右侧发
+  px(21, 6, 6, 6, '#ffd84d');       // 中分缝(露出黄色头皮)
+  px(6, 8, 4, 10, '#4a4d52');       // 左侧发脚
+  px(38, 8, 4, 10, '#4a4d52');      // 右侧发脚
+  px(12, 2, 8, 2, '#70757e');       // 发丝高光
+  px(28, 2, 8, 2, '#70757e');
+  // 亮黄色脸
+  px(10, 10, 28, 22, '#ffd84d');
+  px(12, 12, 10, 3, '#ffefad');
+  px(26, 12, 10, 3, '#ffefad');
+  // 大而圆的眼睛 + 极小瞳孔(呆滞无辜)
+  px(12, 18, 9, 9, '#ffffff');
+  px(27, 18, 9, 9, '#ffffff');
+  px(17, 20, 2, 3, '#14161a');
+  px(32, 20, 2, 3, '#14161a');
+  // 红色圆形腮红
+  px(4, 22, 6, 5, '#e84b4b');
+  px(38, 22, 6, 5, '#e84b4b');
+  // 橘色微张的嘴
+  px(19, 27, 10, 3, '#ff9a1f');
+  px(21, 28, 6, 2, '#b05e00');
+  // 脖子
+  px(20, 32, 8, 5, '#e8b23c');
+  // 黑色无袖连帽背心 + 白色领口线 + 内搭深色边缘
+  px(6, 37, 36, 16, '#1c1d21');
+  px(9, 37, 4, 4, '#ffffff');
+  px(35, 37, 4, 4, '#ffffff');
+  px(19, 37, 10, 3, '#33373d');
+  // 橙色篮球(双手抱于身前, 黑色线条简洁)
+  px(16, 41, 16, 12, '#ff8c1f');
+  px(19, 40, 10, 2, '#ff8c1f');
+  px(19, 52, 10, 2, '#ff8c1f');
+  px(23, 41, 2, 12, '#8a4a00');
+  px(16, 46, 16, 2, '#8a4a00');
+  // 黄色手(抱住篮球)
+  px(3, 41, 5, 8, '#ffd84d');
+  px(40, 41, 5, 8, '#ffd84d');
+  // 粗短双腿 + 浅灰宽松长裤(跑动交替)
+  drawLeg(13, 53, 8, 5, leftSwing, '#a9aeb6', '#878c94');
+  drawLeg(29, 53, 8, 5, rightSwing, '#a9aeb6', '#878c94');
+}
+function drawMa(leftSwing, rightSwing){
+  // 乌黑头发 + 花白鬓角 + 高发际线
+  px(14, 0, 24, 7, '#1a1c1f');
+  px(10, 5, 10, 9, '#1a1c1f');
+  px(32, 5, 10, 9, '#1a1c1f');
+  px(7, 7, 5, 8, '#6a6d73');
+  px(40, 7, 5, 8, '#6a6d73');
+  px(16, 2, 8, 2, '#3a3d42');
+  px(28, 2, 8, 2, '#3a3d42');
+  // 面部(皮肤质感 + 岁月皱纹)
+  px(12, 8, 28, 30, '#e8b98f');
+  px(13, 10, 3, 26, '#d8a878');
+  px(36, 10, 3, 26, '#d8a878');
+  px(16, 11, 20, 1, '#c0906a');   // 抬头纹
+  px(16, 14, 20, 1, '#c0906a');
+  px(16, 17, 20, 1, '#c0906a');
+  px(14, 19, 9, 2, '#2c3138');    // 眉毛
+  px(29, 19, 9, 2, '#2c3138');
+  px(14, 21, 11, 1, '#2c3138');   // 上眼睑(眼神深邃锐利)
+  px(27, 21, 11, 1, '#2c3138');
+  px(15, 22, 9, 5, '#f5f2ea');    // 眼白
+  px(28, 22, 9, 5, '#f5f2ea');
+  px(19, 23, 3, 4, '#14161a');    // 瞳孔
+  px(33, 23, 3, 4, '#14161a');
+  px(15, 26, 2, 3, '#c0906a');    // 眼角纹
+  px(35, 26, 2, 3, '#c0906a');
+  px(23, 22, 6, 7, '#d8a878');    // 鼻子
+  px(24, 28, 1, 2, '#c0906a');
+  px(27, 28, 1, 2, '#c0906a');
+  px(19, 29, 1, 7, '#c0906a');    // 法令纹
+  px(32, 29, 1, 7, '#c0906a');
+  px(20, 33, 12, 2, '#b06a4a');   // 紧闭的嘴唇
+  px(20, 34, 12, 1, '#8a4a30');
+  px(18, 36, 16, 2, '#9aa0a8');   // 胡青下巴
+  px(19, 38, 14, 1, '#9aa0a8');
+  // 脖子
+  px(20, 38, 12, 8, '#d8a878');
+  // 浅灰蓝中式立领唐装
+  px(18, 40, 16, 7, '#7a8ea0');   // 立领
+  px(18, 40, 16, 1, '#c8d6e2');
+  px(6, 46, 40, 16, '#8fa3b5');   // 衣身(柔软布褶)
+  px(8, 50, 2, 10, '#7a8ea0');
+  px(42, 50, 2, 10, '#7a8ea0');
+  px(16, 52, 20, 1, '#b8c8d8');
+  // 三对经典一字盘扣
+  for(var i = 0; i < 3; i++){
+    var by = 48 + i * 4;
+    px(21, by, 6, 2, '#2c3138');
+    px(25, by + 1, 2, 1, '#4a5058');
+  }
+  // 袖子 + 手
+  px(2, 48, 6, 12, '#8fa3b5');
+  px(44, 48, 6, 12, '#8fa3b5');
+  px(3, 58, 4, 4, '#e8b98f');
+  px(45, 58, 4, 4, '#e8b98f');
+  // 宽松白色长裤(裤线平直) + 双腿交替
+  px(24, 62, 2, 8, '#d8d8d6');
+  drawLeg(10, 62, 8, 7, leftSwing, '#f2f2f0', '#d8d8d6');
+  drawLeg(28, 62, 8, 7, rightSwing, '#f2f2f0', '#d8d8d6');
+  // 白色圆头帆布武术鞋(黑色包边)
+  drawShoe(6, 69, 16, leftSwing, '#f5f2ea', '#2c3138');
+  drawShoe(26, 69, 16, rightSwing, '#f5f2ea', '#2c3138');
+}
+function drawChar(p){
+  var sx = p.x - camX;
+  // 地面阴影
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.beginPath(); ctx.ellipse(sx, groundTop + 6, p.w * 0.55, 7, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.save();
+  ctx.translate(sx, p.y);
+  if(p.facing < 0) ctx.scale(-1, 1);          // 根据朝向水平翻转
+  var swing = Math.abs(p.vx) > 0.01 ? (p.step ? 6 : -6) : 0;   // 跑动: 双腿交替 ±6px
+  if(p.side === 'ma') drawMa(swing, -swing);
+  else drawKun(swing, -swing);
+  ctx.restore();
+  if(p.invincible > 0){
+    ctx.strokeStyle = 'rgba(255,215,80,' + (0.5 + 0.4 * Math.sin(performance.now() / 90)) + ')';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(sx, p.y + p.h / 2, p.w * 0.8, 0, Math.PI * 2); ctx.stroke();
+  }
+  if(p.hurtFlash > 0){
+    ctx.fillStyle = 'rgba(255,255,255,' + (p.hurtFlash * 2.2) + ')';
+    ctx.fillRect(sx - p.w / 2, p.y, p.w, p.h);
+  }
+}
+
+/* ============================ 背景(马里奥分层视差) ============================ */
+var clouds = [];
+(function(){
+  for(var i=0;i<7;i++){
+    clouds.push({ x: i * 340 + rnd(0, 120), y: rnd(50, 190), s: rnd(0.8, 1.4) });
+  }
+})();
+function drawSky(){
+  var g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#0d2a8f'); g.addColorStop(0.6, '#2f5fd8'); g.addColorStop(1, '#5f8cf0');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // 像素太阳 (系数0.1)
+  var sx = 830 - camX * 0.1;
+  ctx.fillStyle = '#ffe94a';
+  ctx.fillRect(sx, 60, 34, 34);
+  ctx.fillRect(sx - 11, 70, 11, 11); ctx.fillRect(sx + 34, 70, 11, 11);
+  ctx.fillRect(sx + 10, 49, 11, 11); ctx.fillRect(sx + 10, 94, 11, 11);
+  // 白色像素云 (系数0.1)
+  ctx.fillStyle = '#ffffff';
+  for(var i=0;i<clouds.length;i++){
+    var c = clouds[i];
+    var cx = ((c.x - camX * 0.1) % (W + 220) + (W + 220)) % (W + 220) - 110;
+    var s = c.s;
+    ctx.fillRect(cx, c.y, 30 * s, 10 * s);
+    ctx.fillRect(cx + 8 * s, c.y - 6 * s, 16 * s, 8 * s);
+    ctx.fillRect(cx + 15 * s, c.y - 10 * s, 12 * s, 6 * s);
+    ctx.fillRect(cx + 22 * s, c.y - 4 * s, 14 * s, 8 * s);
+  }
+}
+function drawGround(){                       // 中景地形: 草地平台 + 砖缝 (系数0.5)
+  var off = -(camX * 0.5 % 40);
+  ctx.fillStyle = '#b57a3e';
+  ctx.fillRect(0, groundTop, W, H - groundTop);
+  ctx.strokeStyle = '#7a4a22'; ctx.lineWidth = 3;
+  for(var x = off - 40; x < W + 40; x += 40){
+    ctx.beginPath(); ctx.moveTo(x, groundTop + 14); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for(var y = groundTop + 14; y < H; y += 22){
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  ctx.fillStyle = '#3fc13f';
+  ctx.fillRect(0, groundTop, W, 16);
+  ctx.fillStyle = '#2f9e2f';
+  for(var x = off; x < W + 40; x += 40){ ctx.fillRect(x, groundTop + 8, 20, 8); }
+  ctx.fillStyle = '#57d957';
+  for(var x = off - 20; x < W + 40; x += 40){ ctx.fillRect(x, groundTop, 14, 6); }
+}
+function drawStep(wx){                       // 观众席台阶(棕色梯形, 系数0.5)
+  var sx = wx - camX * 0.5;
+  if(sx < -240 || sx > W + 60) return;
+  ctx.fillStyle = '#8a5a2e';
+  ctx.beginPath();
+  ctx.moveTo(sx - 115, H); ctx.lineTo(sx + 115, H);
+  ctx.lineTo(sx + 70, groundTop + 10); ctx.lineTo(sx - 70, groundTop + 10);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#5f3d1e'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.strokeStyle = '#6f4a24';
+  for(var i=1;i<=3;i++){
+    var y = H - i * 28, half = 115 - i * 14;
+    ctx.beginPath(); ctx.moveTo(sx - half, y); ctx.lineTo(sx + half, y); ctx.stroke();
+  }
+}
+function drawBasket(wx, wy){                 // 橙色像素篮球(圆形, 系数0.5)
+  var sx = wx - camX * 0.5;
+  if(sx < -60 || sx > W + 60) return;
+  ctx.fillStyle = '#ff8c1f';
+  ctx.beginPath(); ctx.arc(sx, wy, 16, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#8a4a00'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(sx, wy, 16, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sx - 16, wy); ctx.lineTo(sx + 16, wy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sx - 11, wy - 12); ctx.lineTo(sx + 11, wy + 12); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sx - 11, wy + 12); ctx.lineTo(sx + 11, wy - 12); ctx.stroke();
+}
+function drawPipe(wx){                       // 绿色水管+武德(近景, 系数0.8)
+  var sx = wx - camX * 0.8;
+  if(sx < -140 || sx > W + 80) return;
+  var by = groundTop - 100;
+  ctx.fillStyle = '#2fbf3f';
+  ctx.fillRect(sx - 26, by, 52, 20);                 // 管口
+  ctx.fillRect(sx - 18, by + 20, 36, 80);            // 管身
+  ctx.fillStyle = '#6fe07a';
+  ctx.fillRect(sx - 26, by, 12, 20);
+  ctx.fillRect(sx - 18, by + 20, 8, 80);
+  ctx.strokeStyle = '#146d1f'; ctx.lineWidth = 3;
+  ctx.strokeRect(sx - 26, by, 52, 20);
+  ctx.strokeRect(sx - 18, by + 20, 36, 80);
+  drawText('武德', sx, by + 58, 18, '#ffffff', 'center', '#146d1f');
+}
+function drawBlock(wx){                      // 金色问号砖+律师函(近景, 系数0.8)
+  var sx = wx - camX * 0.8;
+  if(sx < -120 || sx > W + 160) return;
+  var by = groundTop - 92;
+  ctx.fillStyle = '#f8b81f';
+  ctx.fillRect(sx - 22, by, 44, 44);
+  ctx.strokeStyle = '#8a5a00'; ctx.lineWidth = 3;
+  ctx.strokeRect(sx - 22, by, 44, 44);
+  ctx.strokeRect(sx - 14, by + 8, 28, 28);
+  drawText('?', sx, by + 22, 30, '#ffffff', 'center', '#8a5a00');
+  drawText('律师函', sx + 42, by + 24, 18, '#ffffff', 'left', '#8a5a00');
+}
+function drawBackground(){
+  drawSky();
+  drawStep(60); drawStep(1540);
+  drawBasket(280, 300); drawBasket(700, 255); drawBasket(1050, 310); drawBasket(1350, 280);
+  drawGround();
+  drawPipe(110);
+  drawBlock(1390);
+}
+
+/* ============================ 技能 ============================ */
+function canSkill(p){ return p.hp > 0 && p.stun <= 0 && p.silence <= 0 && p.dash <= 0; }
+function tryUse(p, key, cost, cd, fn){
+  if(!canSkill(p)) return false;
+  if(p.cd[key] && p.cd[key] > 0) return false;
+  if(p.energy < cost){ floatText(p, '能量不足!', '#ffd24a', -46); return false; }
+  p.energy -= cost;
+  p.cd[key] = cd;
+  fn();
+  return true;
+}
+function spawnProj(p, kind, vx, vy, dmg, opts){
+  projectiles.push({ x: p.x + p.facing * 26, y: p.y + p.h * 0.45,
+                     vx: vx * p.facing, vy: vy, owner: p.side, kind: kind,
+                     dmg: dmg, opts: opts || {}, life: 4 });
+}
+function applyDamage(target, attacker, dmg, opts){
+  opts = opts || {};
+  if(target.hp <= 0) return 'dead';
+  if(target.side === 'ma' && Math.random() < 0.2){          // 被动: 20%闪避
+    playSnd('ma_dali');
+    floatText(target, '我大意了,没有闪', '#ffffff', -30);
+    return 'dodge';
+  }
+  if(target.invincible > 0){
+    floatText(target, '化劲!免疫', '#7CFC00', -30);
+    return 'immune';
+  }
+  if(dmg > 0){
+    target.hp = Math.max(0, target.hp - dmg);
+    floatText(target, '-' + dmg, '#ff4444', -30);
+  }
+  target.hpFlash = 0.35;
+  target.hurtFlash = 0.2;
+  if(target.side === 'kun' && performance.now() - lastNiganma > 700){
+    lastNiganma = performance.now();
+    playSnd('kun_niganma');                                  // 被动音效: 你干嘛~哎哟
+  }
+  if(opts.kb){ target.x = clamp(target.x + opts.kb * (target.x < attacker.x ? -1 : 1), 0, 750); }
+  if(target.hp <= 0){ target.hp = 0; win(target.side === 'ma' ? 'kun' : 'ma'); }
+  return 'hit';
+}
+/* --- 马保国 --- */
+function maJ(){
+  if(!canSkill(ma) || (ma.cd.j && ma.cd.j > 0)) return;
+  ma.cd.j = 0.7;
+  spawnProj(ma, 'qi', 7, 0, 15, {});
+  playBoo();
+  playSnd('ma_jie');
+  floatText(ma, '接!', '#57c8ff');
+}
+function maK(){
+  tryUse(ma, 'hua', 30, 3.0, function(){
+    ma.invincible = 2; ma.regenT = 2;
+    playBoo();
+    playSnd('ma_hua');
+    floatText(ma, '化劲儿!2秒无敌', '#7CFC00');
+  });
+}
+function maL(){
+  if(!canSkill(ma) || (ma.cd.l && ma.cd.l > 0)) return;
+  ma.cd.l = 1.6;
+  spawnProj(ma, 'fa', 5.5, 0, 30, {});
+  playBoo();
+  playSnd('ma_fa');
+  floatText(ma, '发!', '#c06bff');
+}
+function maI(){
+  tryUse(ma, 'lightning', 50, 4.0, function(){
+    ma.lightning = 1.6; ma.lightTick = 0;
+    playBoo();
+    playSnd('ma_wubian');
+    floatText(ma, '松活弹抖闪电鞭!', '#b06bff');
+  });
+}
+function maU(){
+  tryUse(ma, 'budao', 40, 2.5, function(){
+    var behind = kun.x - kun.facing * 62;                    // 瞬移到对方身后
+    ma.x = clamp(behind, 0, 750);
+    playBoo();
+    playSnd('ma_budao');
+    floatText(ma, '年轻人不讲武德!', '#ffd24a');
+    applyDamage(kun, ma, 20, { kb: 16 });
+  });
+}
+function maO(){
+  tryUse(ma, 'haozi', 20, 2.0, function(){
+    var healed = Math.min(100, ma.hp + 30) - ma.hp;
+    ma.hp += healed;
+    playBoo();
+    playSnd('ma_haozi');
+    floatText(ma, '耗子尾汁 +' + healed, '#7CFC00');
+  });
+}
+/* --- 蔡徐坤小鸡 --- */
+function kun1(){
+  if(!canSkill(kun) || (kun.cd.k1 && kun.cd.k1 > 0)) return;
+  kun.cd.k1 = 0.8;
+  spawnProj(kun, 'basket', 6.5, 0, 12, { stun: 1 });
+  playBoo();
+  playSnd('kun_jini');
+  floatText(kun, '鸡你太美~', '#ffb02f');
+}
+function kun2(){
+  tryUse(kun, 'tieshan', 20, 2.2, function(){
+    kun.dash = 0.32; kun.dashHit = false;
+    playBoo();
+    playSnd('kun_tieshan');
+    floatText(kun, '铁山靠!', '#ff6b6b');
+  });
+}
+function kun3(){
+  tryUse(kun, 'zhiyin', 25, 2.5, function(){
+    for(var i = -1; i <= 1; i++){
+      var ang = i * 0.30;
+      spawnProj(kun, 'note', Math.cos(ang) * 5, Math.sin(ang) * 5, 8, {});
+    }
+    playBoo();
+    playSnd('kun_zhiyin');
+    floatText(kun, '只因你太美', '#ff9ad5');
+  });
+}
+function kun4(){
+  tryUse(kun, 'lvshi', 40, 3.0, function(){
+    spawnProj(kun, 'letter', 5, 0, 0, { silence: 3 });
+    playBoo();
+    playSnd('kun_lvshi');
+    floatText(kun, '律师函警告!', '#ffffff');
+  });
+}
+function kun5(){
+  tryUse(kun, 'zhuan', 35, 4.0, function(){
+    kun.spin = 3; kun.spinTick = 0;
+    playBoo();
+    playSnd('kun_zhuanquan');
+    floatText(kun, '坤式转圈~哎~', '#ff9ad5');
+  });
+}
+function kun7(){
+  tryUse(kun, 'ge', 50, 6.0, function(){
+    kun.singT = 1.2; kun.singDone = false; kun.singFlash = 0;
+    playBoo();
+    playSnd('kun_ge');
+    floatText(kun, '哼哼哼,只因你太美~', '#ff6fd8');
+  });
+}
+function win(side){ state = 'end'; winner = side; winT = performance.now(); }
+
+/* ============================ 更新 ============================ */
+function updatePlayer(p, dt){
+  var opp = p.side === 'ma' ? kun : ma;
+  if(p.stun > 0){
+    p.stun -= dt;
+  } else {
+    var left, right, jump;
+    if(p.side === 'ma'){ left = keys['KeyA']; right = keys['KeyD']; jump = keys['KeyW']; }
+    else { left = keys['ArrowLeft']; right = keys['ArrowRight']; jump = keys['ArrowUp']; }
+    p.vx = 0;
+    if(left) p.vx -= 3.4;
+    if(right) p.vx += 3.4;
+    if(jump && p.onGround){ p.vy = -11; p.onGround = false; }
+    // 跑动伪动画: 每5帧切换一次步态(左右双腿交替前后摆动)
+    if(left || right){
+      p.animT += dt;
+      if(p.animT >= 5 / 60){ p.animT -= 5 / 60; p.step = 1 - p.step; playHit(); }
+    } else { p.animT = 0; p.step = 0; }
+  }
+  if(p.dash > 0){                                   // 铁山靠冲刺
+    p.dash -= dt;
+    p.x += p.facing * 11;
+    if(!p.dashHit && opp.hp > 0 && Math.abs(opp.x - p.x) < 55){
+      p.dashHit = true;
+      applyDamage(opp, p, 18, { kb: 14 });
+    }
+    if(p.dash <= 0) p.dash = 0;
+  }
+  p.x += p.vx;
+  p.vy += 0.55;
+  p.y += p.vy;
+  if(p.y >= groundTop - p.h){ p.y = groundTop - p.h; p.vy = 0; p.onGround = true; }
+  p.x = clamp(p.x, 0, 750);   // 防跑丢: 左边界 x>=0, 右边界 x<=750
+  p.facing = opp.x > p.x ? 1 : -1;
+  // 计时器
+  p.silence = Math.max(0, p.silence - dt);
+  p.invincible = Math.max(0, p.invincible - dt);
+  if(p.regenT > 0){ p.regenT -= dt; p.hp = Math.min(100, p.hp + 5 * dt); }
+  p.hpFlash = Math.max(0, p.hpFlash - dt);
+  p.hurtFlash = Math.max(0, p.hurtFlash - dt);
+  p.energy = Math.min(100, p.energy + 6 * dt);
+  for(var k in p.cd){ if(p.cd[k] > 0) p.cd[k] -= dt; }
+  // 坤式转圈
+  if(p.spin > 0){
+    p.spin -= dt; p.spinTick += dt;
+    if(opp.hp > 0 && Math.abs(opp.x - p.x) < 62 && p.spinTick >= 1){
+      p.spinTick -= 1;
+      applyDamage(opp, p, 10, { kb: 4 });
+    }
+    if(p.spin <= 0) p.spin = 0;
+  }
+  // 闪电五连鞭
+  if(p.lightning > 0){
+    p.lightning -= dt; p.lightTick += dt;
+    if(p.lightTick >= 0.32){
+      p.lightTick = 0;
+      if(opp.hp > 0) applyDamage(opp, p, 10, { kb: 3 });
+    }
+    if(p.lightning <= 0) p.lightning = 0;
+  }
+  // 唱歌大招蓄力
+  if(p.singT > 0){
+    p.singT -= dt;
+    if(p.singT <= 0 && !p.singDone){
+      p.singDone = true; p.singFlash = 0.7;
+      applyDamage(opp, p, 30);
+    }
+    if(p.singT <= 0) p.singT = 0;
+  }
+  if(p.singFlash > 0) p.singFlash -= dt;
+}
+function updateProjectiles(dt){
+  for(var i = projectiles.length - 1; i >= 0; i--){
+    var pr = projectiles[i];
+    pr.x += pr.vx; pr.y += pr.vy;
+    pr.life -= dt;
+    if(pr.life <= 0 || pr.x < -80 || pr.x > WORLD_W + 80 || pr.y > H){
+      projectiles.splice(i, 1); continue;
+    }
+    var tgt = pr.owner === 'ma' ? kun : ma;
+    var atk = pr.owner === 'ma' ? ma : kun;
+    if(tgt.hp <= 0) continue;
+    var r = rectOf(tgt);
+    if(pr.x > r.x - 8 && pr.x < r.x + r.w + 8 && pr.y > r.y - 8 && pr.y < r.y + r.h + 8){
+      var res = applyDamage(tgt, atk, pr.dmg, { kb: 8 });
+      if(res !== 'dodge' && res !== 'immune'){
+        if(pr.opts.stun){ tgt.stun = Math.max(tgt.stun, pr.opts.stun); floatText(tgt, '眩晕1秒!', '#ffd24a'); }
+        if(pr.opts.silence){ tgt.silence = Math.max(tgt.silence, pr.opts.silence); floatText(tgt, '沉默3秒!', '#eeeeee'); }
+        burst(pr.x, pr.y, pr.opts.color || '#ffffff', 8);
+      }
+      projectiles.splice(i, 1);
+    }
+  }
+}
+function updateFx(dt){
+  for(var i = texts.length - 1; i >= 0; i--){
+    var t = texts[i];
+    t.life -= dt; t.y -= 42 * dt;
+    if(t.life <= 0) texts.splice(i, 1);
+  }
+  for(var j = parts.length - 1; j >= 0; j--){
+    var pt = parts[j];
+    pt.life -= dt; pt.x += pt.vx; pt.y += pt.vy; pt.vy += 0.12;
+    if(pt.life <= 0) parts.splice(j, 1);
+  }
+}
+function update(dt){
+  updatePlayer(ma, dt);
+  updatePlayer(kun, dt);
+  // 互相推开
+  if(Math.abs(ma.x - kun.x) < 62 && Math.abs(ma.y - kun.y) < 70){
+    var push = (62 - Math.abs(ma.x - kun.x)) / 2;
+    if(ma.x < kun.x){ ma.x -= push; kun.x += push; }
+    else { ma.x += push; kun.x -= push; }
+  }
+  updateProjectiles(dt);
+  updateFx(dt);
+  var mid = (ma.x + kun.x) / 2;
+  camX = clamp(mid - W / 2, 0, WORLD_W - W);
+}
+
+/* ============================ 绘制 ============================ */
+function drawProjectiles(){
+  for(var i = 0; i < projectiles.length; i++){
+    var pr = projectiles[i], sx = pr.x - camX, sy = pr.y;
+    if(pr.kind === 'qi'){
+      ctx.fillStyle = '#3fb8ff'; ctx.fillRect(sx - 7, sy - 7, 14, 14);
+      ctx.fillStyle = '#b8ecff'; ctx.fillRect(sx - 3, sy - 3, 6, 6);
+      ctx.strokeStyle = '#0f6db0'; ctx.lineWidth = 2; ctx.strokeRect(sx - 7, sy - 7, 14, 14);
+    } else if(pr.kind === 'fa'){
+      ctx.fillStyle = '#a54bff'; ctx.fillRect(sx - 11, sy - 11, 22, 22);
+      ctx.fillStyle = '#e0c0ff'; ctx.fillRect(sx - 4, sy - 4, 8, 8);
+      ctx.strokeStyle = '#5c1a9e'; ctx.lineWidth = 2; ctx.strokeRect(sx - 11, sy - 11, 22, 22);
+    } else if(pr.kind === 'basket'){
+      ctx.fillStyle = '#ff8c1f';
+      ctx.beginPath(); ctx.arc(sx, sy, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#8a4a00'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(sx, sy, 8, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx - 8, sy); ctx.lineTo(sx + 8, sy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx - 5, sy - 6); ctx.lineTo(sx + 5, sy + 6); ctx.stroke();
+    } else if(pr.kind === 'note'){
+      ctx.fillStyle = '#ff9ad5'; ctx.fillRect(sx - 4, sy - 3, 9, 9);
+      ctx.fillRect(sx + 5, sy - 9, 3, 12);
+      ctx.fillStyle = '#ffcceb'; ctx.fillRect(sx + 5, sy - 9, 6, 3);
+    } else if(pr.kind === 'letter'){
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(sx - 10, sy - 7, 20, 14);
+      ctx.fillStyle = '#dde4ee'; ctx.fillRect(sx - 10, sy - 7, 20, 6);
+      ctx.strokeStyle = '#7a8699'; ctx.lineWidth = 2; ctx.strokeRect(sx - 10, sy - 7, 20, 14);
+      ctx.fillStyle = '#e83030';
+      ctx.beginPath(); ctx.arc(sx, sy + 1, 3, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+}
+function drawEffects(){
+  // 闪电五连鞭
+  if(ma && ma.lightning > 0){
+    ctx.fillStyle = 'rgba(150,80,255,' + (0.10 + 0.06 * Math.sin(performance.now() / 60)) + ')';
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(200,140,255,0.9)'; ctx.lineWidth = 3;
+    for(var i = 0; i < 6; i++){
+      var x = Math.random() * W, px = x, py = 0;
+      ctx.beginPath(); ctx.moveTo(px, py);
+      while(py < H){ px += rnd(-35, 35); py += rnd(35, 65); ctx.lineTo(px, py); }
+      ctx.stroke();
+    }
+  }
+  // 坤式转圈旋风
+  if(kun && kun.spin > 0){
+    var cx = kun.x - camX, cy = kun.y + kun.h / 2;
+    ctx.strokeStyle = '#ff9ad5'; ctx.lineWidth = 4;
+    ctx.setLineDash([10, 8]); ctx.lineDashOffset = -performance.now() / 8;
+    ctx.beginPath(); ctx.arc(cx, cy, 46, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = '#ffd0ec'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx, cy, 30, 0, Math.PI * 2); ctx.stroke();
+  }
+  // 唱歌大招
+  if(kun && kun.singT > 0){
+    ctx.fillStyle = 'rgba(255,111,216,0.13)';
+    ctx.fillRect(0, 0, W, H);
+  }
+  if(kun && kun.singFlash > 0){
+    ctx.fillStyle = 'rgba(255,111,216,' + (kun.singFlash * 0.8) + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+  // 粒子
+  for(var j = 0; j < parts.length; j++){
+    var pt = parts[j];
+    ctx.globalAlpha = Math.max(0, pt.life / pt.max);
+    ctx.fillStyle = pt.c;
+    ctx.fillRect(pt.x - camX - pt.s / 2, pt.y - pt.s / 2, pt.s, pt.s);
+  }
+  ctx.globalAlpha = 1;
+  // 飘字
+  for(var k = 0; k < texts.length; k++){
+    var t = texts[k];
+    ctx.globalAlpha = Math.max(0, t.life / t.max);
+    drawText(t.t, t.x - camX, t.y, 16, t.c, 'center', '#000000');
+  }
+  ctx.globalAlpha = 1;
+}
+function drawHpBar(x, y, w, h, ratio, color, flash, label){
+  capRect(x - 2, y - 2, w + 4, h + 4, h / 2 + 2);
+  ctx.fillStyle = '#1c2130'; ctx.fill();
+  capRect(x, y, w, h, h / 2);
+  ctx.fillStyle = '#2b3145'; ctx.fill();
+  capRect(x, y, w * clamp(ratio, 0, 1), h, h / 2);
+  ctx.fillStyle = color; ctx.fill();
+  if(flash > 0){
+    ctx.globalAlpha = Math.min(1, flash * 2.5);
+    capRect(x, y, w * clamp(ratio, 0, 1), h, h / 2);
+    ctx.fillStyle = '#ffffff'; ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  ctx.lineWidth = 3; ctx.strokeStyle = '#0c0f1a';
+  capRect(x - 2, y - 2, w + 4, h + 4, h / 2 + 2);
+  ctx.stroke();
+  drawText(label, x + (label === '马保国' ? -12 : w + 12), y + h / 2, 15, '#ffffff', label === '马保国' ? 'right' : 'left', '#000000');
+}
+function drawUI(){
+  drawHpBar(30, 22, 280, 20, ma.hp / 100, '#ff4b4b', ma.hpFlash, '马保国');
+  drawHpBar(650, 22, 280, 20, kun.hp / 100, '#4b8bff', kun.hpFlash, '蔡徐坤');
+  capRect(30, 48, 280, 10, 5); ctx.fillStyle = '#1c2130'; ctx.fill();
+  capRect(30, 48, 280 * clamp(ma.energy / 100, 0, 1), 10, 5);
+  ctx.fillStyle = '#ffd24a'; ctx.fill();
+  capRect(650, 48, 280, 10, 5); ctx.fillStyle = '#1c2130'; ctx.fill();
+  capRect(650, 48, 280 * clamp(kun.energy / 100, 0, 1), 10, 5);
+  ctx.fillStyle = '#ffd24a'; ctx.fill();
+  drawText('能量', 30, 64, 10, '#ffe9a0', 'left');
+  drawText('能量', 930, 64, 10, '#ffe9a0', 'right');
+}
+function drawStatus(p){
+  var sx = p.x - camX;
+  if(p.silence > 0) drawText('沉默 ' + p.silence.toFixed(1) + 's', sx, p.y - 36, 14, '#dddddd', 'center', '#222222');
+  else if(p.stun > 0) drawText('眩晕!', sx, p.y - 36, 14, '#ffd24a', 'center', '#222222');
+}
+function drawHints(){
+  drawText('马: WASD移动 W跳 | J接 K化 L发 I闪电五连鞭 U不讲武德 O耗子尾汁', 12, H - 26, 12, 'rgba(255,255,255,0.8)', 'left');
+  drawText('坤: ←→移动 ↑跳 | 小键盘1鸡你太美 2铁山靠 3只因你太美 4律师函警告 5转圈 7唱歌', 12, H - 10, 12, 'rgba(255,255,255,0.8)', 'left');
+}
+function drawStart(){
+  ctx.fillStyle = 'rgba(6,10,28,0.82)';
+  ctx.fillRect(0, 0, W, H);
+  drawText('马保国', W / 2 - 140, 110, 52, '#ff5544', 'center', '#000000');
+  drawText('VS', W / 2, 110, 52, '#ffe94a', 'center', '#000000');
+  drawText('蔡徐坤小鸡版', W / 2 + 130, 110, 40, '#ffd84d', 'center', '#000000');
+  drawText('按 空格键 开始', W / 2, 175, 24, 0.5 + 0.5 * Math.sin(performance.now() / 300) > 0.5 ? '#ffffff' : '#ffd24a', 'center', '#000000');
+  ctx.globalAlpha = 0.9;
+  drawText('【马保国】', 190, 235, 18, '#ff8877', 'center');
+  drawText('W跳 A左 D右 | J接(15伤) K化(30能量·无敌2秒) L发(30伤)', 190, 262, 14, '#e8e8e8', 'center');
+  drawText('I闪电五连鞭(50能量·5段x10) U不讲武德(40能量·20伤) O耗子尾汁(20能量·回30)', 190, 284, 14, '#e8e8e8', 'center');
+  drawText('被动: 被击中20%闪避', 190, 306, 14, '#9ad0ff', 'center');
+  drawText('【蔡徐坤小鸡】', 770, 235, 18, '#ffd84d', 'center');
+  drawText('↑跳 ←→移动 | 1鸡你太美(12伤+眩晕) 2铁山靠(20能量·18伤)', 770, 262, 14, '#e8e8e8', 'center');
+  drawText('3只因你太美(25能量·3音符) 4律师函警告(40能量·沉默3秒)', 770, 284, 14, '#e8e8e8', 'center');
+  drawText('5坤式转圈(35能量·10伤/秒) 7唱歌(50能量·30伤)', 770, 306, 14, '#e8e8e8', 'center');
+  ctx.globalAlpha = 1;
+  drawText('提示: 音效文件缺失会自动静默跳过, 游戏不会崩溃', W / 2, 500, 13, '#9aa3ad', 'center');
+}
+function drawEnd(){
+  ctx.fillStyle = 'rgba(6,10,28,0.78)';
+  ctx.fillRect(0, 0, W, H);
+  var t = (performance.now() - winT) / 1000;
+  var sc = Math.max(0.6, 1 + 0.5 * Math.exp(-2.2 * t) * Math.sin(t * 9));
+  var name = winner === 'ma' ? '马保国' : '蔡徐坤小鸡版';
+  var line = winner === 'ma' ? '不讲武德!' : '只因你太美!';
+  var col = winner === 'ma' ? '#ff5544' : '#ffd84d';
+  drawText('K.O.', W / 2, 170, 44, '#ffffff', 'center', '#000000');
+  ctx.save();
+  ctx.translate(W / 2, 280);
+  ctx.scale(sc, sc);
+  drawText(name + ' 胜!', 0, 0, 60, col, 'center', '#000000');
+  drawText(line, 0, 60, 30, '#ffe94a', 'center', '#000000');
+  ctx.restore();
+  drawText('按 R 重新开始', W / 2, 420, 24, 0.5 + 0.5 * Math.sin(performance.now() / 300) > 0.5 ? '#ffffff' : '#ffd24a', 'center', '#000000');
+}
+function draw(){
+  drawBackground();
+  if(state === 'play' || state === 'end'){
+    drawChar(ma);
+    drawChar(kun);
+    drawProjectiles();
+    drawEffects();
+    drawStatus(ma);
+    drawStatus(kun);
+    drawUI();
+    if(state === 'play') drawHints();
+  }
+  if(state === 'start') drawStart();
+  if(state === 'end') drawEnd();
+}
+
+/* ============================ 主循环 ============================ */
+function loop(t){
+  var dt = Math.min(0.05, ((t || 0) - lastTime) / 1000 || 0.016);
+  lastTime = t;
+  timeNow = t;
+  if(state === 'play') update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+window.__gameAPI = { start: function(){ unlockAudio(); startGame(); }, restart: restart, getState: function(){ return state; } };
+})();
+
+    </script>
+</body>
+</html>
